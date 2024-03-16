@@ -1,5 +1,5 @@
 CXXFLAGS := -pedantic-errors -Wall
-LDLIBS := -lGL -lglut
+LDLIBS := -lGL -lGLEW -lglut
 
 # Diretórios importantes.
 SRC_DIR := src/
