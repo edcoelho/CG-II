@@ -12,8 +12,6 @@
 #include <iostream>
 
 // Headers implementados
-#include "glut_callbacks.hpp"
-
 #include "scene/Camera.hpp"
 #include "scene/Scene.hpp"
 #include "scene/Window.hpp"
