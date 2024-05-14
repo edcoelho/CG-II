@@ -6,7 +6,7 @@ void scene::Camera::compute_projection_matrix() {
 
     this->projection_matrix.SetIdentity();
 
-    if (this->get_projection_type() == PROJECAO_PERSPECTIVA) {
+    if (this->get_projection_type() == scene::ProjectionType::PERSPECTIVE) {
 
         this->projection_matrix(0, 0) = 2.0 * this->get_near() / (this->get_right() - this->get_left());
         this->projection_matrix(0, 2) = -(this->get_right() + this->get_left()) / (this->get_right() - this->get_left());

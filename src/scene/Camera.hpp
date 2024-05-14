@@ -8,8 +8,8 @@ namespace scene {
 
 enum ProjectionType {
 
-    PROJECAO_ORTOGRAFICA,
-    PROJECAO_PERSPECTIVA
+    ORTHOGRAPHIC,
+    PERSPECTIVE
 
 };
 
@@ -40,7 +40,7 @@ class Camera {
 
         // --- CONSTRUTORES ---
 
-        Camera(cyVec3d _position = cyVec3d(0.0), cyVec3d _look_at = cyVec3d(0.0, 0.0, 1.0), cyVec3d _view_up = cyVec3d(0.0, 1.0, 0.0), ProjectionType _projection_type = PROJECAO_ORTOGRAFICA, double _near = 0.1, double _far = 1000.0, double _bottom = -500.0, double _top = 500.0, double _left = -500.0, double _right = 500.0);
+        Camera(cyVec3d _position = cyVec3d(0.0), cyVec3d _look_at = cyVec3d(0.0, 0.0, 1.0), cyVec3d _view_up = cyVec3d(0.0, 1.0, 0.0), ProjectionType _projection_type = scene::ProjectionType::ORTHOGRAPHIC, double _near = 0.1, double _far = 1000.0, double _bottom = -500.0, double _top = 500.0, double _left = -500.0, double _right = 500.0);
 
         // --- GETTERS E SETTERS ---
 
