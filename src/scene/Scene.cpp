@@ -1,11 +1,11 @@
 #include "scene/Scene.hpp"
 
-scene::Camera& scene::Scene::get_camera() {
+cgII::Camera& cgII::Scene::get_camera() {
 
     return this->camera;
 
 }
-void scene::Scene::set_camera(scene::Camera c) {
+void cgII::Scene::set_camera(cgII::Camera c) {
 
     this->camera = c;
 

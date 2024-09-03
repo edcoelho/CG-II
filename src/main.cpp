@@ -1,23 +1,15 @@
-#include "include_list.hpp"
+#include <iostream>
+#include <stdexcept>
+#include <string>
 
-// Assinaturas das funções callbacks do GLUT.
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+#include <glm/vec4.hpp>
 
-// É chamada quando o FreeGLUT necessita desenhar algo na tela.
-void display ();
-// Lida com eventos de teclado envolvendo teclas com representações em ASCII.
-void keyboard (unsigned char key, int x, int y);
-// Lida com eventos de teclado envolvendo teclas especiais, como Shift, Ctrl, Fn, de F1 até F12, etc.
-void special_func_keyboard (int key, int x, int y);
-// Lida com eventos envolvendo os botões do mouse.
-void mouse (int button, int state, int x, int y);
-// Lida com eventos envolvendo o movimento do mouse enquanto um botão é pressionado.
-void mouse_motion (int x, int y);
-// Lida com eventos envolvendo o movimento passivo do mouse (quando não tem um botão pressionado).
-void mouse_passive_motion (int x, int y);
-// Lida com eventos de redimensionamento de janelas.
-void window_reshape (int x, int y);
-// Lida com momentos em que não há nenhum evento sendo processado.
-void idle ();
+#include "utils.hpp"
+#include "graphics/Window.hpp"
+#include "graphics/Shader.hpp"
+#include "graphics/Program.hpp"
 
 int main(int argc, char * argv[]) {
 
@@ -26,22 +18,8 @@ int main(int argc, char * argv[]) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitContextFlags(GLUT_DEBUG);
 
-    // Cria uma janela.
-    scene::Window window(500, 500, cyColorA(0.0, 1.0), "CG II");
-
-    // Inicializa o GLEW para carregar as funções do OpenGL.
-    GLenum erro = glewInit();
-    if (erro != GLEW_OK) {
-
-        std::cout << "Erro ao inicializar o GLEW!" << std::endl;
-        std::cout << "Erro: " << glewGetErrorString(erro) << std::endl;
-
-        return EXIT_FAILURE;
-
-    }
-
-    // Habilita a impressão de erros do GLSL no console.
-    CY_GL_REGISTER_DEBUG_CALLBACK;
+    // Cria a janela.
+    cgII::Window window(500, 500, glm::vec4(0.0, 0.0, 0.0, 1.0), "CG II");
 
     // Define as funções callback do FreeGLUT.
     glutDisplayFunc(display);
@@ -53,30 +31,32 @@ int main(int argc, char * argv[]) {
     glutReshapeFunc(window_reshape);
     glutIdleFunc(idle);
 
-    // Cria um programa GLSL.
-    cyGLSLProgram programa;
-    programa.CreateProgram();
+    // Inicializa o GLEW para carregar as funções do OpenGL.
+    GLenum glew_status = glewInit();
+    if (glew_status != GLEW_OK) {
 
-    // Cria um vertex shader e o atribui ao programa.
-    cyGLSLShader vertex_shader;
-    vertex_shader.CompileFile("shaders/vertex.vert", GL_VERTEX_SHADER);
-    programa.AttachShader(vertex_shader);
-
-    // Cria um fragment shader e o atribui ao programa.
-    cyGLSLShader fragment_shader;
-    fragment_shader.CompileFile("shaders/fragment.frag", GL_FRAGMENT_SHADER);
-    programa.AttachShader(fragment_shader);
-
-    // Linka o programa para que os seus shaders sejam usados.
-    if (!programa.Link()) {
-
-        std::cout << "Erro ao linkar o programa!" << std::endl;
+        std::cout << "GLEW: Erro ao inicializar!" << std::endl;
+        std::cout << "GLEW: " << glewGetErrorString(glew_status) << std::endl;
         return EXIT_FAILURE;
 
     }
 
-    // Indica que o programa será usado.
-    programa.Bind();
+    // Cria um programa GLSL.
+    cgII::Program program;
+
+    // Cria um vertex shader e o atribui ao programa.
+    cgII::Shader vertex_shader(GL_VERTEX_SHADER);
+    vertex_shader.compile("shaders/vertex.glsl");
+    program.attach(vertex_shader);
+
+    // Cria um fragment shader e o atribui ao programa.
+    cgII::Shader fragment_shader(GL_FRAGMENT_SHADER);
+    fragment_shader.compile("shaders/fragment.glsl");
+    program.attach(fragment_shader);
+
+    // Linka o programa para que os seus shaders sejam usados e indica que ele será usado.
+    program.link();
+    program.use();
 
     // Passando a matriz MVP para o programa.
     GLfloat n = 1.0f, f = 5.0f, t = 5.0f, b = -5.0f, r = 5.0f, l = -5.0f;
@@ -87,13 +67,13 @@ int main(int argc, char * argv[]) {
         {0.0f, 0.0f, 0.0f, 1.0f}
     };
 
-    glUniformMatrix4fv(glGetUniformLocation(programa.GetID(), "mvp"), 1, GL_FALSE, &mvp[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_FALSE, &mvp[0][0]);
 
     // Vértices para teste
     float vertices[] = {
-        -3.0f, 2.5f, 0.0f,
-        4.5f, 0.5f, 0.0f,
-        0.0f, -4.0f, 0.0f,
+        -3.0f, 2.5f, 2.0f,
+        4.5f, 0.5f, 2.0f,
+        0.0f, -4.0f, 2.0f,
     };
 
     // Cria um Vertex Array Object (VAO)
@@ -108,7 +88,7 @@ int main(int argc, char * argv[]) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Descreve ao OpenGL a organização dos dados no buffer.
-    GLuint pos = glGetAttribLocation(programa.GetID(), "pos");
+    GLuint pos = glGetAttribLocation(program.get_id(), "pos");
     glEnableVertexAttribArray(pos);
     glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 

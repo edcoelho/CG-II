@@ -1,27 +1,27 @@
-#ifndef SCENE_SCENE_HPP
-#define SCENE_SCENE_HPP
+#ifndef CGII_CGII_HPP
+#define CGII_CGII_HPP
 
 #include "scene/Camera.hpp"
 
-namespace scene{
+namespace cgII{
 
 class Scene {
 
     private:
 
-        scene::Camera camera;
+        cgII::Camera camera;
         
     public:
 
         // --- CONSTRUTORES ---
 
-        Scene(scene::Camera& camera);
+        Scene(cgII::Camera& camera);
 
         // --- GETTERS E SETTERS ---
 
         // Retorna uma referência para a câmera da cena.
-        scene::Camera& get_camera();
-        void set_camera(scene::Camera c);
+        cgII::Camera& get_camera();
+        void set_camera(cgII::Camera c);
 
         // --- OUTROS MÉTODOS ---
 

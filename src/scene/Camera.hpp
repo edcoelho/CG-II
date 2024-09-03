@@ -1,10 +1,10 @@
-#ifndef SCENE_CAMERA_HPP
-#define SCENE_CAMERA_HPP
+#ifndef CGII_CAMERA_HPP
+#define CGII_CAMERA_HPP
 
 #include "cyCodeBase/cyVector.h"
 #include "cyCodeBase/cyMatrix.h"
 
-namespace scene {
+namespace cgII {
 
 enum ProjectionType {
 
@@ -40,7 +40,7 @@ class Camera {
 
         // --- CONSTRUTORES ---
 
-        Camera(cyVec3d _position = cyVec3d(0.0), cyVec3d _look_at = cyVec3d(0.0, 0.0, 1.0), cyVec3d _view_up = cyVec3d(0.0, 1.0, 0.0), ProjectionType _projection_type = scene::ProjectionType::ORTHOGRAPHIC, double _near = 0.1, double _far = 1000.0, double _bottom = -500.0, double _top = 500.0, double _left = -500.0, double _right = 500.0);
+        Camera(cyVec3d _position = cyVec3d(0.0), cyVec3d _look_at = cyVec3d(0.0, 0.0, 1.0), cyVec3d _view_up = cyVec3d(0.0, 1.0, 0.0), ProjectionType _projection_type = cgII::ProjectionType::ORTHOGRAPHIC, double _near = 0.1, double _far = 1000.0, double _bottom = -500.0, double _top = 500.0, double _left = -500.0, double _right = 500.0);
 
         // --- GETTERS E SETTERS ---
 
@@ -54,7 +54,7 @@ class Camera {
         void set_view_up(cyVec3d pos, bool update_view_matrix = true);
 
         ProjectionType get_projection_type() const;
-        void set_projection_type(scene::ProjectionType type, bool update_projection_matrix = true);
+        void set_projection_type(cgII::ProjectionType type, bool update_projection_matrix = true);
 
         double get_near() const;
         void set_near(double scalar, bool update_projection_matrix = true);
