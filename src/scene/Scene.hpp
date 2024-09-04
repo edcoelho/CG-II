@@ -1,5 +1,5 @@
-#ifndef CGII_CGII_HPP
-#define CGII_CGII_HPP
+#ifndef CGII_SCENE_HPP
+#define CGII_SCENE_HPP
 
 #include "scene/Camera.hpp"
 

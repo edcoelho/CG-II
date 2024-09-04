@@ -6,119 +6,30 @@
 #include <GL/freeglut.h>
 #include <glm/vec4.hpp>
 
-#include "utils.hpp"
 #include "graphics/Window.hpp"
 #include "graphics/Shader.hpp"
 #include "graphics/Program.hpp"
+#include "cyCodeBase/cyGL.h"
 
-int main(int argc, char * argv[]) {
-
-    // Inicializa o FreeGLUT.
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitContextFlags(GLUT_DEBUG);
-
-    // Cria a janela.
-    cgII::Window window(500, 500, glm::vec4(0.0, 0.0, 0.0, 1.0), "CG II");
-
-    // Define as funções callback do FreeGLUT.
-    glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(special_func_keyboard);
-    glutMouseFunc(mouse);
-    glutMotionFunc(mouse_motion);
-    glutPassiveMotionFunc(mouse_passive_motion);
-    glutReshapeFunc(window_reshape);
-    glutIdleFunc(idle);
-
-    // Inicializa o GLEW para carregar as funções do OpenGL.
-    GLenum glew_status = glewInit();
-    if (glew_status != GLEW_OK) {
-
-        std::cout << "GLEW: Erro ao inicializar!" << std::endl;
-        std::cout << "GLEW: " << glewGetErrorString(glew_status) << std::endl;
-        return EXIT_FAILURE;
-
-    }
-
-    // Cria um programa GLSL.
-    cgII::Program program;
-
-    // Cria um vertex shader e o atribui ao programa.
-    cgII::Shader vertex_shader(GL_VERTEX_SHADER);
-    vertex_shader.compile("shaders/vertex.glsl");
-    program.attach(vertex_shader);
-
-    // Cria um fragment shader e o atribui ao programa.
-    cgII::Shader fragment_shader(GL_FRAGMENT_SHADER);
-    fragment_shader.compile("shaders/fragment.glsl");
-    program.attach(fragment_shader);
-
-    // Linka o programa para que os seus shaders sejam usados e indica que ele será usado.
-    program.link();
-    program.use();
-
-    // Passando a matriz MVP para o programa.
-    GLfloat n = 1.0f, f = 5.0f, t = 5.0f, b = -5.0f, r = 5.0f, l = -5.0f;
-    GLfloat mvp[4][4] = {
-        {2.0f/(r-l), 0.0f, 0.0f, -(r+l)/(r-l)},
-        {0.0f, 2.0f/(t-b), 0.0f, -(t+b)/(t-b)},
-        {0.0f, 0.0f, 2.0f/(f-n), -(f+n)/(f-n)},
-        {0.0f, 0.0f, 0.0f, 1.0f}
-    };
-
-    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_FALSE, &mvp[0][0]);
-
-    // Vértices para teste
-    float vertices[] = {
-        -3.0f, 2.5f, 2.0f,
-        4.5f, 0.5f, 2.0f,
-        0.0f, -4.0f, 2.0f,
-    };
-
-    // Cria um Vertex Array Object (VAO)
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    // Cria um Vertex Buffer Object (VBO).
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Descreve ao OpenGL a organização dos dados no buffer.
-    GLuint pos = glGetAttribLocation(program.get_id(), "pos");
-    glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-
-    // Entra no loop do FreeGLUT.
-    glutMainLoop();
-
-    return EXIT_SUCCESS;
-
-}
-
+// Called when FreeGLUT needs to draw something on the screen.
 void display () {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // TODO
-
-    // Troca o buffer exibido (double buffering).
     glutSwapBuffers();
 
 }
 
+// Handles keyboard events involving keys that have ASCII representations.
 void keyboard (unsigned char key, int x, int y) {
 
     switch (key) {
 
         case 27: // ESC
 
-            // Encerra o loop principal do FreeGLUT.
+            // Terminates the main FreeGLUT loop.
             glutLeaveMainLoop();
 
             break;
@@ -128,46 +39,112 @@ void keyboard (unsigned char key, int x, int y) {
 
     }
 
-    // Pede ao FreeGLUT para chamar a função display.
+    // Asks GLUT to call the display function.
     glutPostRedisplay();
 
 }
 
-void special_func_keyboard (int key, int x, int y) {
+// Handles keyboard events involving special keys like Shift, Ctrl, Fn, F1 to F12, etc.
+void special_func_keyboard (int key, int x, int y) {}
 
-    // TODO
+// Handles events involving mouse buttons.
+void mouse (int button, int state, int x, int y) {}
 
-}
+// Handles events involving mouse movement while a button is being pressed.
+void mouse_drag (int x, int y) {}
 
-void mouse (int button, int state, int x, int y) {
+// Handles events involving passive mouse movement (when no button is being pressed).
+void mouse_passive_motion (int x, int y) {}
 
-    // TODO
+// Handles window resizing events.
+void window_reshape (int x, int y) {}
 
-}
-
-void mouse_motion (int x, int y) {
-
-    // TODO
-
-}
-
-void mouse_passive_motion (int x, int y) {
-
-    // TODO
-
-}
-
-void window_reshape (int x, int y) {
-
-    // TODO
-
-}
-
+// Handles moments when no events are being processed.
 void idle () {
 
-    // TODO
-
-    // Pede ao FreeGLUT para chamar a função display.
+    // Asks GLUT to call the display function.
     glutPostRedisplay();
+
+}
+
+int main(int argc, char * argv[]) {
+
+    // Initialize GLUT.
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitContextFlags(GLUT_DEBUG);
+
+    cgII::Window window(500, 500, glm::vec4(0.0, 0.0, 0.0, 1.0), "CG II");
+
+    // Set GLUT callbacks.
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(special_func_keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(mouse_drag);
+    glutPassiveMotionFunc(mouse_passive_motion);
+    glutReshapeFunc(window_reshape);
+    glutIdleFunc(idle);
+
+    // Initialize GLEW to load OpenGL API.
+    GLenum glew_status = glewInit();
+    if (glew_status != GLEW_OK) {
+
+        std::cout << "GLEW: Erro ao inicializar!" << std::endl;
+        std::cout << "GLEW: " << glewGetErrorString(glew_status) << std::endl;
+        return EXIT_FAILURE;
+
+    }
+
+    CY_GL_REGISTER_DEBUG_CALLBACK
+
+    cgII::Program program;
+
+    cgII::Shader vertex_shader(GL_VERTEX_SHADER);
+    vertex_shader.compile("shaders/vertex.glsl");
+    program.attach(vertex_shader);
+
+    cgII::Shader fragment_shader(GL_FRAGMENT_SHADER);
+    fragment_shader.compile("shaders/fragment.glsl");
+    program.attach(fragment_shader);
+
+    program.link();
+    program.use();
+
+    // Model View Projection matrix
+    GLfloat n = -1.0f, f = -5.0f, t = 5.0f, b = -5.0f, r = 5.0f, l = -5.0f;
+    GLfloat mvp[4][4] = {
+        {2.0f/(r-l), 0.0f, 0.0f, -(r+l)/(r-l)},
+        {0.0f, 2.0f/(t-b), 0.0f, -(t+b)/(t-b)},
+        {0.0f, 0.0f, 2.0f/(f-n), -(f+n)/(f-n)},
+        {0.0f, 0.0f, 0.0f, 1.0f}
+    };
+
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_TRUE, &mvp[0][0]); // "transpose" is set to GL_TRUE because the matrix is stored in the C++ program as row-major, while the shader will interpret it as column-major. This is due to the order of matrix multiplication by a vector. When we multiply the matrix on the left side of the vector (A*v), GLSL will interpret the matrix as column-major and the vector as a column vector. Conversely, when we multiply the matrix on the right side of the vector (v*A), GLSL will interpret the matrix as row-major and the vector as a row vector.
+
+    float vertexes[] = {
+        -3.0f, 2.5f, -2.0f,
+        4.5f, 0.5f, -2.0f,
+        0.0f, -4.0f, -2.0f,
+    };
+
+    // Create a Vertex Array Object (VAO)
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    // Create a Vertex Buffer Object (VBO).
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexes), vertexes, GL_STATIC_DRAW);
+
+    GLuint pos = glGetAttribLocation(program.get_id(), "pos");
+    glEnableVertexAttribArray(pos);
+    glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+    glutMainLoop();
+
+    return EXIT_SUCCESS;
 
 }
