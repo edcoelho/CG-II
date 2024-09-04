@@ -9,7 +9,7 @@
 #include "graphics/Window.hpp"
 #include "graphics/Shader.hpp"
 #include "graphics/Program.hpp"
-#include "cyCodeBase/cyGL.h"
+#include "utils.hpp"
 
 // Called when FreeGLUT needs to draw something on the screen.
 void display () {
@@ -96,16 +96,16 @@ int main(int argc, char * argv[]) {
 
     }
 
-    CY_GL_REGISTER_DEBUG_CALLBACK
+    cgII::enable_openGL_debug_messages();
 
     cgII::Program program;
 
     cgII::Shader vertex_shader(GL_VERTEX_SHADER);
-    vertex_shader.compile("shaders/vertex.glsl");
+    vertex_shader.compile("shaders/vertex.vert");
     program.attach(vertex_shader);
 
     cgII::Shader fragment_shader(GL_FRAGMENT_SHADER);
-    fragment_shader.compile("shaders/fragment.glsl");
+    fragment_shader.compile("shaders/fragment.frag");
     program.attach(fragment_shader);
 
     program.link();
@@ -120,13 +120,26 @@ int main(int argc, char * argv[]) {
         {0.0f, 0.0f, 0.0f, 1.0f}
     };
 
-    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_TRUE, &mvp[0][0]); // "transpose" is set to GL_TRUE because the matrix is stored in the C++ program as row-major, while the shader will interpret it as column-major. This is due to the order of matrix multiplication by a vector. When we multiply the matrix on the left side of the vector (A*v), GLSL will interpret the matrix as column-major and the vector as a column vector. Conversely, when we multiply the matrix on the right side of the vector (v*A), GLSL will interpret the matrix as row-major and the vector as a row vector.
-
     float vertexes[] = {
         -3.0f, 2.5f, -2.0f,
         4.5f, 0.5f, -2.0f,
         0.0f, -4.0f, -2.0f,
     };
+
+    // GLfloat mvp[4][4] = {
+    //     {1.0f, 0.0f, 0.0f, 0.0f},
+    //     {0.0f, 1.0f, 0.0f, 0.0f},
+    //     {0.0f, 0.0f, 1.0f, 0.0f},
+    //     {0.0f, 0.0f, 0.0f, 1.0f}
+    // };
+
+    // float vertexes[] = {
+    //     -0.5f, 0.5f, 0.5f,
+    //     0.6f, 0.0f, 0.5f,
+    //     0.0f, -0.8f, 0.5f,
+    // };
+
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_TRUE, &mvp[0][0]); // "transpose" is set to GL_TRUE because the matrix is stored in the C++ program as row-major, while the shader will interpret it as column-major. This is due to the order of matrix multiplication by a vector. When we multiply the matrix on the left side of the vector (A*v), GLSL will interpret the matrix as column-major and the vector as a column vector. Conversely, when we multiply the matrix on the right side of the vector (v*A), GLSL will interpret the matrix as row-major and the vector as a row vector.
 
     // Create a Vertex Array Object (VAO)
     GLuint vao;
