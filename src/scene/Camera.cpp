@@ -1,179 +1,220 @@
 #include "scene/Camera.hpp"
 
-// --- MÉTODOS PRIVADOS ---
+namespace cgII {
 
-void cgII::Camera::compute_projection_matrix() {
+    Camera::Camera(glm::vec3 _position, glm::vec3 _look_at, glm::vec3 _view_up, projection _projection_type, float _near, float _far, float _bottom, float _top, float _left, float _right) : position(_position), look_at(_look_at), view_up(_view_up), projection_type(_projection_type), near(_near), far(_far), bottom(_bottom), top(_top), left(_left), right(_right) {}
 
-    this->projection_matrix.SetIdentity();
+    glm::vec3 Camera::get_position() const {
 
-    if (this->get_projection_type() == cgII::ProjectionType::PERSPECTIVE) {
+        return this->position;
 
-        this->projection_matrix(0, 0) = 2.0 * this->get_near() / (this->get_right() - this->get_left());
-        this->projection_matrix(0, 2) = -(this->get_right() + this->get_left()) / (this->get_right() - this->get_left());
+    }
+    void Camera::set_position(glm::vec3 _position) {
 
-        this->projection_matrix(1, 1) = 2.0 * this->get_near() / (this->get_top() - this->get_bottom());
-        this->projection_matrix(1, 2) = -(this->get_top() + this->get_bottom()) / (this->get_top() - this->get_bottom());
-
-        this->projection_matrix(2, 2) = (this->get_far() + this->get_near()) / (this->get_far() - this->get_near());
-        this->projection_matrix(2, 3) = -2.0 * this->get_near() * this->get_far() / (this->get_far() - this->get_near());
-
-        this->projection_matrix(3, 2) = 1.0;
-        this->projection_matrix(3, 3) = 0.0;
-
-    } else {
-
-        this->projection_matrix(0, 0) = 2.0 / (this->get_right() - this->get_left());
-        this->projection_matrix(0, 3) = -(this->get_right() + this->get_left()) / (this->get_right() - this->get_left());
-
-        this->projection_matrix(1, 1) = 2.0 / (this->get_top() - this->get_bottom());
-        this->projection_matrix(1, 3) = -(this->get_top() + this->get_bottom()) / (this->get_top() - this->get_bottom());
-
-        this->projection_matrix(2, 2) = 2.0 / (this->get_far() - this->get_near());
-        this->projection_matrix(2, 3) = -(this->get_far() + this->get_near()) / (this->get_far() - this->get_near());
+        this->position = _position;
 
     }
 
-}
+    glm::vec3 Camera::get_look_at() const {
 
-// --- CONSTRUTORES ---
+        return this->look_at;
 
-cgII::Camera::Camera(cyVec3d _position, cyVec3d _look_at, cyVec3d _view_up, ProjectionType _projection_type, double _near, double _far, double _bottom, double _top, double _left, double _right) : position(_position), look_at(_look_at), view_up(_view_up), projection_type(_projection_type), near(_near), far(_far), bottom(_bottom), top(_top), left(_left), right(_right) {
+    }
+    void Camera::set_look_at(glm::vec3 _look_at) {
 
-    this->view_matrix.SetView(_position, _look_at, _view_up);
-    this->compute_projection_matrix();
+        this->look_at = _look_at;
 
-}
+    }
 
-cyVec3d cgII::Camera::get_position() const {
+    glm::vec3 Camera::get_view_up() const {
 
-    return this->position;
+        return this->view_up;
 
-}
-void cgII::Camera::set_position(cyVec3d pos, bool update_view_matrix) {
+    }
+    void Camera::set_view_up(glm::vec3 _view_up) {
 
-    this->position = pos;
-    if (update_view_matrix) this->view_matrix.SetView(pos, this->get_look_at(), this->get_view_up());
+        this->view_up = _view_up;
 
-}
+    }
 
-cyVec3d cgII::Camera::get_look_at() const {
+    projection Camera::get_projection_type() const {
 
-    return this->look_at;
+        return this->projection_type;
 
-}
-void cgII::Camera::set_look_at(cyVec3d pos, bool update_view_matrix) {
+    }
+    void Camera::set_projection_type(projection _projection_type) {
 
-    this->look_at = pos;
-    if (update_view_matrix) this->view_matrix.SetView(this->get_position(), pos, this->get_view_up());
+        this->projection_type = _projection_type;
 
-}
+    }
 
-cyVec3d cgII::Camera::get_view_up() const {
+    float Camera::get_near() const {
 
-    return this->view_up;
+        return this->near;
 
-}
-void cgII::Camera::set_view_up(cyVec3d pos, bool update_view_matrix) {
+    }
+    void Camera::set_near(float _near) {
 
-    this->view_up = pos;
-    if(update_view_matrix) this->view_matrix.SetView(this->get_position(), this->get_look_at(), pos);
+        this->near = _near;
 
-}
+    }
 
-cgII::ProjectionType cgII::Camera::get_projection_type() const {
+    float Camera::get_far() const {
 
-    return this->projection_type;
+        return this->far;
 
-}
-void cgII::Camera::set_projection_type(cgII::ProjectionType type, bool update_projection_matrix) {
+    }
+    void Camera::set_far(float _far) {
 
-    this->projection_type = type;
-    if (update_projection_matrix) this->compute_projection_matrix();
+        this->far = _far;
 
-}
+    }
 
-double cgII::Camera::get_near() const {
+    float Camera::get_bottom() const {
 
-    return this->near;
+        return this->bottom;
 
-}
-void cgII::Camera::set_near(double scalar, bool update_projection_matrix) {
+    }
+    void Camera::set_bottom(float _bottom) {
 
-    this->near = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
+        this->bottom = _bottom;
 
-}
+    }
 
-double cgII::Camera::get_far() const {
+    float Camera::get_top() const {
 
-    return this->far;
+        return this->top;
 
-}
-void cgII::Camera::set_far(double scalar, bool update_projection_matrix) {
+    }
+    void Camera::set_top(float _top) {
 
-    this->far = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
+        this->top = _top;
 
-}
+    }
 
-double cgII::Camera::get_bottom() const {
+    float Camera::get_left() const {
 
-    return this->bottom;
+        return this->left;
 
-}
-void cgII::Camera::set_bottom(double scalar, bool update_projection_matrix) {
+    }
+    void Camera::set_left(float _left) {
 
-    this->bottom = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
-
-}
-
-double cgII::Camera::get_top() const {
-
-    return this->top;
-
-}
-void cgII::Camera::set_top(double scalar, bool update_projection_matrix) {
-
-    this->top = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
+        this->left = _left;
 
 
-}
+    }
 
-double cgII::Camera::get_left() const {
+    float Camera::get_right() const {
 
-    return this->left;
+        return this->right;
 
-}
-void cgII::Camera::set_left(double scalar, bool update_projection_matrix) {
+    }
+    void Camera::set_right(float _right) {
 
-    this->left = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
+        this->right = _right;
 
+    }
 
-}
+    // The returned matrix is stored in column-major for, as this is how GLM and GLSL store matrices.
+    glm::mat4 Camera::projection_matrix () const {
 
-double cgII::Camera::get_right() const {
+        glm::vec4 col0, col1, col2, col3;
 
-    return this->right;
+        if (this->get_projection_type() == PERSPECTIVE) {
 
-}
-void cgII::Camera::set_right(double scalar, bool update_projection_matrix) {
+            col0 = glm::vec4(
+                (2.0f * near) / (right - left),
+                0.0f,
+                0.0f, 
+                0.0f
+            );
 
-    this->right = scalar;
-    if (update_projection_matrix) this->compute_projection_matrix();
+            col1 = glm::vec4(
+                0.0f,
+                (2.0f * near) / (top - bottom),
+                0.0f,
+                0.0f
+            );
 
-}
+            col2 = glm::vec4(
+                (right + left) / (right - left),
+                (top + bottom) / (top - bottom),
+                -(far + near) / (far - near),
+                -1.0f
+            );
 
-cyMatrix4d const& cgII::Camera::get_view_matrix() const {
+            col3 = glm::vec4(
+                0.0f,
+                0.0f,
+                -(2.0f * far * near) / (far - near),
+                0.0f
+            );
 
-    return this->view_matrix;
+        } else {
 
-}
+            col0 = glm::vec4(
+                2.0f / (right - left),
+                0.0f,
+                0.0f,
+                0.0f
+            );
 
-cyMatrix4d const& cgII::Camera::get_projection_matrix() const {
+            col1 = glm::vec4(
+                0.0f,
+                2.0f / (top - bottom),
+                0.0f,
+                0.0f
+            );
 
-    return this->projection_matrix;
+            col2 = glm::vec4(
+                0.0f,
+                0.0f,
+                2.0f / (far - near),
+                0.0f
+            );
+
+            col3 = glm::vec4(
+                -(right + left) / (right - left),
+                -(top + bottom) / (top - bottom),
+                -(far + near) / (far - near),
+                1.0f
+            );
+
+        }
+
+        return glm::mat4(col0, col1, col2, col3);
+
+    }
+
+    // The returned matrix is stored in column-major for, as this is how GLM and GLSL store matrices.
+    glm::mat4 Camera::view_matrix () const {
+
+        glm::mat4 matrix(1.0f);
+        glm::vec3 camera_x_axis, camera_y_axis, camera_z_axis;
+
+        camera_z_axis = position - look_at;
+        camera_z_axis = glm::normalize(camera_z_axis);
+
+        camera_x_axis = glm::cross(view_up, camera_z_axis); // view_up is defined in view/camera space
+        camera_x_axis = glm::normalize(camera_x_axis);
+
+        camera_y_axis = glm::cross(camera_z_axis, camera_x_axis);
+        camera_y_axis = glm::normalize(camera_y_axis);
+        
+        for (int i = 0; i < 3; i++) {
+
+            matrix[i][0] = camera_x_axis[i];
+            matrix[i][1] = camera_y_axis[i];
+            matrix[i][2] = camera_z_axis[i];
+
+        }
+
+        matrix[3][0] = -glm::dot(camera_x_axis, position);
+        matrix[3][1] = -glm::dot(camera_y_axis, position);
+        matrix[3][2] = -glm::dot(camera_z_axis, position);
+
+        return matrix;
+
+    }
 
 }

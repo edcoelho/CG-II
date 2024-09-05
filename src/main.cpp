@@ -4,11 +4,14 @@
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <glm/vec4.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "graphics/Window.hpp"
 #include "graphics/Shader.hpp"
 #include "graphics/Program.hpp"
+#include "scene/Camera.hpp"
 #include "utils.hpp"
 
 // Called when FreeGLUT needs to draw something on the screen.
@@ -98,6 +101,29 @@ int main(int argc, char * argv[]) {
 
     cgII::enable_openGL_debug_messages();
 
+    cgII::Camera camera(
+        glm::vec3(0.0f, 0.0f, 0.0f), // position
+        glm::vec3(0.0f, 0.0f, -1.0f), // look_at
+        glm::vec3(0.0f, 1.0f, 0.0f), // view_up (in view/camera space)
+        cgII::PERSPECTIVE, // projection type
+        // near and far distances (positive numbers)
+        1.0f, 5.0f,
+        // bottom, top, left, right
+        -5.0f, 5.0f, -5.0f, 5.0f
+    );
+    glm::mat4
+        model_mat(1.0f),
+        view_mat = camera.view_matrix(),
+        projection_mat = camera.projection_matrix();
+
+    float z_v = -5.0;
+
+    float vertexes[] = {
+        -3.0f, 2.5f, z_v,
+        4.5f, 0.5f, z_v,
+        0.0f, -4.0f, z_v
+    };
+
     cgII::Program program;
 
     cgII::Shader vertex_shader(GL_VERTEX_SHADER);
@@ -111,35 +137,9 @@ int main(int argc, char * argv[]) {
     program.link();
     program.use();
 
-    // Model View Projection matrix
-    GLfloat n = -1.0f, f = -5.0f, t = 5.0f, b = -5.0f, r = 5.0f, l = -5.0f;
-    GLfloat mvp[4][4] = {
-        {2.0f/(r-l), 0.0f, 0.0f, -(r+l)/(r-l)},
-        {0.0f, 2.0f/(t-b), 0.0f, -(t+b)/(t-b)},
-        {0.0f, 0.0f, 2.0f/(f-n), -(f+n)/(f-n)},
-        {0.0f, 0.0f, 0.0f, 1.0f}
-    };
-
-    float vertexes[] = {
-        -3.0f, 2.5f, -2.0f,
-        4.5f, 0.5f, -2.0f,
-        0.0f, -4.0f, -2.0f,
-    };
-
-    // GLfloat mvp[4][4] = {
-    //     {1.0f, 0.0f, 0.0f, 0.0f},
-    //     {0.0f, 1.0f, 0.0f, 0.0f},
-    //     {0.0f, 0.0f, 1.0f, 0.0f},
-    //     {0.0f, 0.0f, 0.0f, 1.0f}
-    // };
-
-    // float vertexes[] = {
-    //     -0.5f, 0.5f, 0.5f,
-    //     0.6f, 0.0f, 0.5f,
-    //     0.0f, -0.8f, 0.5f,
-    // };
-
-    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "mvp"), 1, GL_TRUE, &mvp[0][0]); // "transpose" is set to GL_TRUE because the matrix is stored in the C++ program as row-major, while the shader will interpret it as column-major. This is due to the order of matrix multiplication by a vector. When we multiply the matrix on the left side of the vector (A*v), GLSL will interpret the matrix as column-major and the vector as a column vector. Conversely, when we multiply the matrix on the right side of the vector (v*A), GLSL will interpret the matrix as row-major and the vector as a row vector.
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "model_mat"), 1, GL_FALSE, glm::value_ptr(model_mat));
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "view_mat"), 1, GL_FALSE, glm::value_ptr(view_mat));
+    glUniformMatrix4fv(glGetUniformLocation(program.get_id(), "projection_mat"), 1, GL_FALSE, glm::value_ptr(projection_mat));
 
     // Create a Vertex Array Object (VAO)
     GLuint vao;
@@ -152,9 +152,9 @@ int main(int argc, char * argv[]) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexes), vertexes, GL_STATIC_DRAW);
 
-    GLuint pos = glGetAttribLocation(program.get_id(), "pos");
-    glEnableVertexAttribArray(pos);
-    glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+    GLuint position = glGetAttribLocation(program.get_id(), "position");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
     glutMainLoop();
 

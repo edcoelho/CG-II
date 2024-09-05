@@ -13,17 +13,10 @@ class Scene {
         
     public:
 
-        // --- CONSTRUTORES ---
-
         Scene(cgII::Camera& camera);
 
-        // --- GETTERS E SETTERS ---
-
-        // Retorna uma referência para a câmera da cena.
         cgII::Camera& get_camera();
         void set_camera(cgII::Camera c);
-
-        // --- OUTROS MÉTODOS ---
 
 };
 
