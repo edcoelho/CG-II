@@ -3,11 +3,7 @@
 
 namespace cgII {
 
-    Program::Program () : is_created(true) {
-
-        this->id = glCreateProgram();
-
-    }
+    Program::Program () : is_created(false) {}
     Program::~Program () {
 
         this->destroy();
@@ -17,6 +13,13 @@ namespace cgII {
     GLuint Program::get_id () const {
 
         return this->id;
+
+    }
+
+    void Program::create () {
+
+        this->id = glCreateProgram();
+        this->is_created = true;
 
     }
 

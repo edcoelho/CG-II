@@ -8,11 +8,7 @@
 
 namespace cgII {
 
-    Shader::Shader (GLenum _type) : type(_type), is_compiled(false) {
-
-        this->id = glCreateShader(_type);
-
-    }
+    Shader::Shader (GLenum _type) : type(_type), is_compiled(false) {}
 
     Shader::~Shader () {
 
@@ -38,9 +34,10 @@ namespace cgII {
         if (this->is_compiled) { 
 
             this->destroy();
-            this->id = glCreateShader(this->get_type());
 
         }
+
+        this->id = glCreateShader(this->get_type());
 
         // Reads source code of the shader from the file.
         std::ifstream stream(source_path);

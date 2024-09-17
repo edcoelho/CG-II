@@ -35,7 +35,7 @@ ALL: $(BUILD_DIR) main
 
 # Target para gerar executável para debugging.
 debug: CXXFLAGS += -g
-debug: clean ALL
+debug: ALL
 
 # Target para ligação.
 main: $(MAIN_OBJ) $(OBJ_FILES)

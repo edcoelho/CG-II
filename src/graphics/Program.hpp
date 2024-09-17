@@ -22,6 +22,9 @@ namespace cgII {
 
             GLuint get_id () const;
 
+            // Create the program.
+            void create ();
+
             // Attachs a shader to the program.
             void attach (GLuint shader_id);
             // Attachs a shader to the program.
